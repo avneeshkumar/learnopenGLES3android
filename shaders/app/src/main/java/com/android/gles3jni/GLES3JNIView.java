@@ -17,6 +17,7 @@
 package com.android.gles3jni;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
@@ -33,7 +34,8 @@ import javax.microedition.khronos.opengles.GL10;
 class GLES3JNIView extends GLSurfaceView {
     private static final String TAG = "GLES3JNI";
     private static final boolean DEBUG = true;
-
+    public static AssetManager assetManager;
+    public static String pathToInternalDir;
     public GLES3JNIView(Context context) {
         super(context);
         // Pick an EGLConfig with RGB8 color, 16-bit depth, no stencil,
@@ -41,6 +43,8 @@ class GLES3JNIView extends GLSurfaceView {
         setEGLConfigChooser(8, 8, 8, 0, 16, 0);
         setEGLContextClientVersion(2);
         setRenderer(new Renderer());
+        assetManager = context.getAssets();
+        pathToInternalDir = context.getFilesDir().getAbsolutePath();
     }
 
     private static class Renderer implements GLSurfaceView.Renderer {
@@ -54,6 +58,8 @@ class GLES3JNIView extends GLSurfaceView {
 
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
             GLES3JNILib.init();
+            GLES3JNILib.Helper(assetManager,pathToInternalDir);
+
         }
     }
 }

@@ -18,6 +18,8 @@ package com.android.gles3jni;
 
 // Wrapper for native library
 
+import android.content.res.AssetManager;
+
 public class GLES3JNILib {
 
      static {
@@ -27,4 +29,5 @@ public class GLES3JNILib {
      public static native void init();
      public static native void resize(int width, int height);
      public static native void step();
+     public  static native void Helper( AssetManager assetManager,String pathToInternalDir);
 }

@@ -19,7 +19,9 @@
 
 #include <android/log.h>
 #include <math.h>
-
+#include <string>
+#include <android/asset_manager.h>
+#include <android/asset_manager_jni.h>
 #if DYNAMIC_ES3
 #include "gl3stub.h"
 #else
@@ -37,7 +39,6 @@
 #endif
 // returns true if a GL error occurred
 extern bool checkGlError(const char* funcName);
-extern GLuint createShader(GLenum shaderType, const char* src);
 extern GLuint createProgram(const char* vtxSrc, const char* fragSrc);
 
 // ----------------------------------------------------------------------------
@@ -48,6 +49,8 @@ public:
     virtual ~Renderer();
     void resize(int w, int h);
     void render();
+    std::string shaderpath;
+    AAssetManager* apkAssetManager;
 
 protected:
     Renderer();
@@ -60,6 +63,7 @@ protected:
     // the buffer is filled with per-instance scale and rotation transforms.
 
     virtual void draw() = 0;
+
 };
 
 extern Renderer* createES2Renderer();

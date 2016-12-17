@@ -17,7 +17,7 @@
 #include <jni.h>
 #include <stdlib.h>
 #include <time.h>
-
+#include <string>
 #include "gles3jni.h"
 
 
@@ -62,51 +62,7 @@ GLuint createShader(GLenum shaderType, const char* src) {
     return shader;
 }
 
-GLuint createProgram(const char* vtxSrc, const char* fragSrc) {
-    GLuint vtxShader = 0;
-    GLuint fragShader = 0;
-    GLuint program = 0;
-    GLint linked = GL_FALSE;
 
-    vtxShader = createShader(GL_VERTEX_SHADER, vtxSrc);
-    if (!vtxShader)
-        goto exit;
-
-    fragShader = createShader(GL_FRAGMENT_SHADER, fragSrc);
-    if (!fragShader)
-        goto exit;
-
-    program = glCreateProgram();
-    if (!program) {
-        checkGlError("glCreateProgram");
-        goto exit;
-    }
-    glAttachShader(program, vtxShader);
-    glAttachShader(program, fragShader);
-
-    glLinkProgram(program);
-    glGetProgramiv(program, GL_LINK_STATUS, &linked);
-    if (!linked) {
-        ALOGE("Could not link program");
-        GLint infoLogLen = 0;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLen);
-        if (infoLogLen) {
-            GLchar* infoLog = (GLchar*)malloc(infoLogLen);
-            if (infoLog) {
-                glGetProgramInfoLog(program, infoLogLen, NULL, infoLog);
-                ALOGE("Could not link program:\n%s\n", infoLog);
-                free(infoLog);
-            }
-        }
-        glDeleteProgram(program);
-        program = 0;
-    }
-
-exit:
-    glDeleteShader(vtxShader);
-    glDeleteShader(fragShader);
-    return program;
-}
 
 static void printGlString(const char* name, GLenum s) {
     const char* v = (const char*)glGetString(s);
@@ -187,4 +143,27 @@ Java_com_android_gles3jni_GLES3JNILib_step(JNIEnv* env, jobject obj) {
     if (g_renderer) {
         g_renderer->render();
     }
+}
+
+JNIEXPORT void JNICALL
+Java_com_android_gles3jni_GLES3JNILib_Helper(JNIEnv *env, jobject obj, jobject assetManager, jstring pathToInternalDir){
+    // get a native instance of the asset manager
+    // assetManager is passed from Java and should not be garbage collected!
+    if (g_renderer) {
+
+        g_renderer->apkAssetManager = AAssetManager_fromJava(env, assetManager);
+    }
+
+
+    //Save app internal data storage path -- we will extract assets and save here
+    const char *cPathToInternalDir;
+    cPathToInternalDir = env->GetStringUTFChars(pathToInternalDir, NULL ) ;
+    if (g_renderer) {
+        g_renderer->shaderpath = std::string(cPathToInternalDir);
+    }
+
+    env->ReleaseStringUTFChars(pathToInternalDir, cPathToInternalDir);
+
+    //mutex for thread safety
+    //pthread_mutex_init(&threadMutex, NULL );
 }

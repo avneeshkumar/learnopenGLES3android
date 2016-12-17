@@ -14,6 +14,7 @@ android {
         ndk {
             abiFilters 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a'
         }
+
         externalNativeBuild {
             cmake {
                     // pass command line arguments to cmake: our CMakeLists.txt needs it
@@ -21,7 +22,7 @@ android {
                     // other ndk flags could also be configured there [cppFlags, cFlags...]
                 arguments "-DANDROID_PLATFORM_LEVEL=${platformVersion}",
                           '-DANDROID_TOOLCHAIN=clang', '-DANDROID_STL=gnustl_static'
-                cppFlags "-std=c++11 -frtti -fexceptions"
+                //cppFlags "-std=c++11 -frtti -fexceptions"
             }
         }
     }
@@ -36,6 +37,12 @@ android {
         cmake {
             path 'src/main/cpp/CMakeLists.txt'
         }
+    }
+    dependencies {
+// other stuff here
+        compile 'com.android.support:support-v4:23.0.0'
+// update the 23.0.0 to latest version available
+
     }
 }
 
